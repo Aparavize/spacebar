@@ -1,8 +1,7 @@
 (function(ns){
 	require.config({
-		baseUrl: '',
 		paths:{
-			
+			'jquery':'vendor/jquery.min'
 		},
 		shim: {
 			'jquery': {
@@ -11,10 +10,14 @@
 		}
 	});
 		
-	require(['jquery'], function($){
-		$(function(){
-			
+	require([
+		'jquery', 
+		'spacebar/Main'
+		], 
+		function($, Main){
+			$(document).ready(function(){
+				Main.init();
+			});
 		});
-	});
 	
 })(window.spacebar = window.spacebar || {});
