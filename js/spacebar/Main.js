@@ -9,6 +9,16 @@ define(
 	function(ns, $, Player, Bullet, Meteor) {
 		var Main = {
 			init: function(){
+				// shim layer with setTimeout fallback
+				window.requestAnimFrame = (function(){
+				  return  window.requestAnimationFrame       ||
+				          window.webkitRequestAnimationFrame ||
+				          window.mozRequestAnimationFrame    ||
+				          function( callback ){
+				            window.setTimeout(callback, 1000 / 60);
+				          };
+				})();
+
 				var canvas = document.getElementById('canvas');
 				var ctx = canvas.getContext('2d');
 				var lastTimeShot = Date.now();
@@ -189,11 +199,12 @@ define(
 				    }
 				}
 				 
-				function run() {
+				(function run() {
+					requestAnimFrame(run);
 				    update((Date.now() - time) / 1000);
 				    render();
 				    time = Date.now();
-				}
+				})()
 				
 				function addMeteor() {
 					var _meteor = new Meteor({});
@@ -206,7 +217,6 @@ define(
 				}
 
 				var time = Date.now();
-				setInterval(run, 10);
 				setInterval(addMeteor, 750);
 			}
 			
