@@ -3,15 +3,18 @@ define(
 		'spacebar/NameSpace',
 		'jquery',
 		'spacebar/Player',
-		'spacebar/Bullet'
+		'spacebar/Bullet',
+		'spacebar/Meteor'
 	], 
-	function(ns, $, Player, Bullet) {
+	function(ns, $, Player, Bullet, Meteor) {
 		var Main = {
 			init: function(){
 				var canvas = document.getElementById('canvas');
 				var ctx = canvas.getContext('2d');
 				var lastTimeShot = Date.now();
 				var hasShot = false;
+				var hasMeteors = false;
+				var meteorsLive = [];
 				var bulletsShot = [];
 				
 				var player_one = new Player({
@@ -62,6 +65,22 @@ define(
 				    		}
 				    	}
 				    }
+
+				    if(hasMeteors){
+				    	for(var i =0; i < meteorsLive.length; i++){
+				    		var _meteor = meteorsLive[i];
+
+				    		_meteor.y += Math.round(_meteor.speedY * mod)
+				    		_meteor.x += Math.round(_meteor.speedX * mod) * _meteor.directionX;
+
+				    		if(_meteor.y > canvas.height){
+				    			var index = meteorsLive.indexOf(_meteor);
+
+				    			if(index > -1)
+				    				meteorsLive.splice(index, 1);
+				    		}
+				    	}
+				    }
 				}
 
 				function shoot() {
@@ -98,6 +117,13 @@ define(
 				    		ctx.drawImage(_bullet.skin, 0, 0, _bullet.width, _bullet.height, _bullet.x, _bullet.y, _bullet.width, _bullet.height);
 				    	}
 				    }
+				    if(hasMeteors){
+				    	for(var i =0; i < meteorsLive.length; i++){
+				    		var _meteor = meteorsLive[i];	
+
+				    		ctx.drawImage(_meteor.skin, 0, 0, _meteor.width, _meteor.height, _meteor.x, _meteor.y, _meteor.width, _meteor.height);
+				    	}
+				    }
 				}
 				 
 				function run() {
@@ -106,8 +132,19 @@ define(
 				    time = Date.now();
 				}
 				
+				function addMeteor() {
+					var _meteor = new Meteor({});
+					_meteor.x = Math.round(Math.random() * (canvas.width - _meteor.width))
+
+					meteorsLive.push(_meteor);
+
+					if(!hasMeteors)
+						hasMeteors = true;
+				}
+
 				var time = Date.now();
 				setInterval(run, 10);
+				setInterval(addMeteor, 1000);
 			}
 			
 		};
