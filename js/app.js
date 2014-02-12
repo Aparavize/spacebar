@@ -21,7 +21,7 @@
 
 				// COUNT FPS
 				var stats = new Stats();
-				stats.setMode(1); // 0: fps, 1: ms
+				stats.setMode(0); // 0: fps, 1: ms
 
 				// Align top-left
 				stats.domElement.style.position = 'absolute';
