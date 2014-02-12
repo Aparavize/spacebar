@@ -200,7 +200,7 @@ define(
 				}
 				 
 				(function run() {
-					requestAnimFrame(run);
+					window.requestAnimFrame(run);
 				    update((Date.now() - time) / 1000);
 				    render();
 				    time = Date.now();
