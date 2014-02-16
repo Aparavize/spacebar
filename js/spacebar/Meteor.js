@@ -27,7 +27,29 @@ define(
 		};
 
 		Meteor.prototype = {
+			update:function(mod){
+	    		this.y += Math.round(this.speedY * mod);
+	    		this.x += Math.round(this.speedX * mod) * this.directionX;
+	    		this.rotateAngle += Math.round(this.rotateSpeed * mod);
 
+	    		if(this.y > ns.canvas.height){
+	    			var index = ns.activeMeteors.indexOf(this);
+
+	    			if(index > -1){
+	    				ns.activeMeteors.splice(index, 1);
+	    				
+	    				if(ns.activeMeteors.length <= 0)
+	    					ns.hasMeteors = false;
+	    			}
+	    		}
+			},
+
+			render:function(){
+				var _meteorCenterX = this.x + ((this.width / 2) * this.directionX);
+	    		var _meteorCenterY = this.y + this.height / 2;
+
+	    		ns.drawRotatedImage(this, _meteorCenterX, _meteorCenterY, this.rotateAngle)
+			}
 		};
 
 		return Meteor;

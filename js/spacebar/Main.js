@@ -4,222 +4,105 @@ define(
 		'jquery',
 		'spacebar/Player',
 		'spacebar/Bullet',
-		'spacebar/Meteor'
+		'spacebar/Meteor',
+		'spacebar/CollisionController'
 	], 
-	function(ns, $, Player, Bullet, Meteor) {
+	function(ns, $, Player, Bullet, Meteor, CollisionController) {
 		var Main = {
 			init: function(){
-				// shim layer with setTimeout fallback
-				window.requestAnimFrame = (function(){
-				  return  window.requestAnimationFrame       ||
-				          window.webkitRequestAnimationFrame ||
-				          window.mozRequestAnimationFrame    ||
-				          function( callback ){
-				            window.setTimeout(callback, 1000 / 60);
-				          };
-				})();
 
-				var canvas = document.getElementById('canvas');
-				var ctx = canvas.getContext('2d');
-				var lastTimeShot = Date.now();
-				var hasShot = false;
-				var hasMeteors = false;
-				var meteorsLive = [];
-				var bulletsShot = [];
-				var collisions = [];
-				
-				var player_one = new Player({
+				// Variables accessibles in Main
+				var player = new Player({
 					width:99,
 					height:75
 				});
+
+				var collisionController = new CollisionController();
+				var time = Date.now();
 				
-				var keysDown = {};
+				// Events for keyboard interaction
 				window.addEventListener('keydown', function(e) {
-				    keysDown[e.keyCode] = true;
+				    ns.keysDown[e.keyCode] = true;
 				});
 				window.addEventListener('keyup', function(e) {
-				    delete keysDown[e.keyCode];
+				    delete ns.keysDown[e.keyCode];
 				});
 
-				var TO_RADIANS = Math.PI/180; 
-				
-				function drawRotatedImage(meteor, x, y, angle) { 
-					// save the current co-ordinate system 
-					// before we screw with it
-					ctx.save(); 
-				 
-					// move to the middle of where we want to draw our image
-					ctx.translate(x, y);
-				 
-					// rotate around that point, converting our 
-					// angle from degrees to radians 
-					ctx.rotate(angle * TO_RADIANS);
-				 
-					// draw it up and to the left by half the width
-					// and height of the image 
-					ctx.drawImage(meteor.skin, 0, 0, meteor.width, meteor.height, -(meteor.width/2), -(meteor.width/2), meteor.width, meteor.height);
-				 
-					// and restore the co-ords to how they were when we began
-					ctx.restore(); 
+				//========================
+				// Helper functions
+				//========================
+				function addMeteor() {
+					ns.lastMeteorSpawnTime = Date.now();
+
+					var _meteor = new Meteor({});
+					_meteor.x = Math.round(Math.random() * (ns.canvas.width - _meteor.width))
+
+					ns.activeMeteors.push(_meteor);
+
+					if(!ns.hasMeteors)
+						ns.hasMeteors = true;
 				}
-				 
+
+
+				//========================
+				// Main functions
+				//========================
 				function update(mod) {
-				    if (37 in keysDown) {
-				        if(player_one.x > 0)
-				        	player_one.x -= Math.round(player_one.speed * mod);
-				    }
-				    if (38 in keysDown) {
-				    	if(player_one.y > 0)
-				        	player_one.y -= Math.round(player_one.speed * mod);
-				    }
-				    if (39 in keysDown) {
-				    	if(player_one.x + player_one.width < canvas.width)
-				        	player_one.x += Math.round(player_one.speed * mod);
-				    }
-				    if (40 in keysDown) {
-				    	if(player_one.y + player_one.height < canvas.height)
-				        	player_one.y += Math.round(player_one.speed * mod);
-				    }
-				    if (32 in keysDown) {
-				    	shoot();
-				    }
+					// Update the collision controller to check and deal with collisions
+					collisionController.update();
 
-			    	if(hasShot){
-				    	for(var i =0; i < bulletsShot.length; i++){
-				    		var _bullet = bulletsShot[i];
+					if((time - ns.lastMeteorSpawnTime) >= 750)
+						addMeteor();
 
-				    		_bullet.y -= Math.round(_bullet.speed * mod)
+					// Update player
+					player.update(mod);
 
-				    		if(_bullet.y < 0){
-				    			var index = bulletsShot.indexOf(_bullet);
-
-				    			if(index > -1)
-				    				bulletsShot.splice(index, 1);
-				    		}
+					// Update bullets, if any
+			    	if(ns.hasShot){
+				    	for(var i = 0; i < ns.activeBullets.length; i++){
+							ns.activeBullets[i].update(mod);
 				    	}
 				    }
 
-				    if(hasMeteors){
-				    	for(var i =0; i < meteorsLive.length; i++){
-				    		var _meteor = meteorsLive[i];
-
-				    		_meteor.y += Math.round(_meteor.speedY * mod);
-				    		_meteor.x += Math.round(_meteor.speedX * mod) * _meteor.directionX;
-				    		_meteor.rotateAngle += Math.round(_meteor.rotateSpeed * mod);
-
-				    		if(_meteor.y > canvas.height){
-				    			var index = meteorsLive.indexOf(_meteor);
-
-				    			if(index > -1)
-				    				meteorsLive.splice(index, 1);
-				    		}
-				    	}
-				    }
-				}
-
-				function shoot() {
-					if((Date.now() - lastTimeShot) / 1000 < 0.1)
-						return;
-
-				    lastTimeShot = Date.now();
-
-				    var _bullet = new Bullet({
-				    	width: 9,
-				    	height: 54,
-				    	x: player_one.x + player_one.width / 2 - 5,
-				    	y: player_one.y,
-				    	speed: player_one.speed * 1.5 
-				    }); 
-
-				    bulletsShot.push(_bullet);
-
-				    if(!hasShot)
-				  	  hasShot = true;
+				    // Update meteors, if any
+				    if(ns.hasMeteors){
+			    		for(var i = 0; i < ns.activeMeteors.length; i++){
+			    			ns.activeMeteors[i].update(mod);
+			    		}
+			    	}
 				}
 				 
 				function render() {
-				    ctx.fillStyle = '#000';
-				    ctx.fillRect(0, 0, canvas.width, canvas.height);
+					// Clear stage with a black BG
+				    ns.ctx.fillStyle = '#000';
+				    ns.ctx.fillRect(0, 0, ns.canvas.width, ns.canvas.height);
 
-				    if(player_one.isReady){
-				    	ctx.drawImage(player_one.skin, 0, 0, player_one.width, player_one.height, player_one.x, player_one.y, player_one.width, player_one.height);
-				    }
+				    // Render Player
+			    	player.render();
 
-				    if(hasShot){
-				    	for(var i =0; i < bulletsShot.length; i++){
-				    		var _bullet = bulletsShot[i];	
-
-				    		ctx.drawImage(_bullet.skin, 0, 0, _bullet.width, _bullet.height, _bullet.x, _bullet.y, _bullet.width, _bullet.height);
-				    	}
-				    }
-				    if(hasMeteors){
-				    	for(var i =0; i < meteorsLive.length; i++){
-				    		var _meteor = meteorsLive[i];
-
-				    		var _meteorCenterX = _meteor.x + ((_meteor.width / 2) * _meteor.directionX);
-				    		var _meteorCenterY = _meteor.y + _meteor.height / 2;
-
-				    		drawRotatedImage(_meteor, _meteorCenterX, _meteorCenterY, _meteor.rotateAngle)
-				    		//ctx.drawImage(_meteor.skin, 0, 0, _meteor.width, _meteor.height, _meteor.x, _meteor.y, _meteor.width, _meteor.height);
+			    	// Render Bullets, if any
+				    if(ns.hasShot){
+				    	for(var i =0; i < ns.activeBullets.length; i++){
+				    		ns.activeBullets[i].render();	
 				    	}
 				    }
 
-				    if(hasShot && hasMeteors) {
-				    	collisions = [];
-
-				    	for(var i=0; i < bulletsShot.length; i++){
-				    		var _bullet = bulletsShot[i];
-
-				    		for(var j = 0; j < meteorsLive.length; j++){
-				    			var _meteor = meteorsLive[j];
-
-				    			var hit = _bullet.x >= _meteor.x && _bullet.x <= _meteor.x + _meteor.width && _bullet.y >= _meteor.y && _bullet.y <= _meteor.y + _meteor.height;
-				    			
-				    			if(hit)
-				    				collisions.push({bullet:_bullet, meteor:_meteor})
-				    		}
+				    // Render Meteors, if any
+				    if(ns.hasMeteors){
+				    	for(var i =0; i < ns.activeMeteors.length; i++){
+				    		ns.activeMeteors[i].render();
 				    	}
-
-					    // Il y a eu des collisions
-					    if(collisions.length > 0){
-					    	for(var i=0; i < collisions.length; i++){
-					    			var index = meteorsLive.indexOf(collisions[i].meteor);
-
-					    			if(index > -1)
-					    				meteorsLive.splice(index, 1);
-
-					    			index = bulletsShot.indexOf(collisions[i].bullet);
-
-					    			if(index > -1)
-					    				bulletsShot.splice(index, 1);
-					    	}
-
-					    	collisions = [];
-					    }
 				    }
 				}
-				 
+				
+				// Calls itself immediately
 				(function run() {
 					window.requestAnimFrame(run);
 				    update((Date.now() - time) / 1000);
 				    render();
 				    time = Date.now();
-				})()
-				
-				function addMeteor() {
-					var _meteor = new Meteor({});
-					_meteor.x = Math.round(Math.random() * (canvas.width - _meteor.width))
-
-					meteorsLive.push(_meteor);
-
-					if(!hasMeteors)
-						hasMeteors = true;
-				}
-
-				var time = Date.now();
-				setInterval(addMeteor, 750);
+				})();
 			}
-			
 		};
 
 		return Main;

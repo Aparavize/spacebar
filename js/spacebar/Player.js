@@ -1,10 +1,17 @@
 define(
 	[
 		'spacebar/NameSpace',
-		'jquery'
+		'jquery',
+		'spacebar/Bullet'
 	], 
-	function(ns, $) {
+	function(ns, $, Bullet) {
 		var Player = function(options){
+			this.SPACEBAR = 32; 
+			this.LEFT_ARROW = 37; 
+			this.RIGHT_ARROW = 39; 
+			this.UP_ARROW = 40; 
+			this.DOWN_ARROW = 38; 
+
 			this.isReady = false;
 			this.name = options.name || 'Player 1';
 			this.lives = options.lives || 5;
@@ -24,37 +31,54 @@ define(
 		};
 
 		Player.prototype = {
+			update:function(mod){
+				// Look out for Arrow keys
+				if (this.LEFT_ARROW in ns.keysDown) {
+			        if(this.x > 0)
+			        	this.x -= Math.round(this.speed * mod);
+			    }
+			    if (this.DOWN_ARROW in ns.keysDown) {
+			    	if(this.y > 0)
+			        	this.y -= Math.round(this.speed * mod);
+			    }
+			    if (this.RIGHT_ARROW in ns.keysDown) {
+			    	if(this.x + this.width < ns.canvas.width)
+			        	this.x += Math.round(this.speed * mod);
+			    }
+			    if (this.UP_ARROW in ns.keysDown) {
+			    	if(this.y + this.height < ns.canvas.height)
+			        	this.y += Math.round(this.speed * mod);
+			    }
 
-			// Get a property from the player
-			// @prop : STRING
-			getProp : function(prop){
-				if(this.hasOwnProperty(prop)){
-					return this[prop];
-				}
-				else {
-					var errorMsg = 'Player "' + this.name + '" does not have any instance of the property "' + prop + '" requested.';
-					throw new Error(errorMsg); 
-				}
+			    // If Spacebar was hit, shoot
+			    if (this.SPACEBAR in ns.keysDown) {
+			    	this.shoot();
+			    }
 			},
 
-			// Set a property of the player
-			// @prop : STRING
-			// @value : Any type
-			setProp : function(prop, value){
-				this[prop] = value;
+			render:function(){
+				ns.ctx.drawImage(this.skin, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 			},
 
-			// Add lives
-			addLives : function(nLives){
-				this.lives += nLives;
-			},
+			shoot:function(){
+				if((Date.now() - ns.lastTimeShot) / 1000 < 0.1)
+					return;
 
-			// Remove lives
-			removeLives : function(nLives){
-				this.lives -= nLives;
+				var _self = this;
+			    ns.lastTimeShot = Date.now();
 
-				if(this.lives <= 0)
-					this.lives = 0;
+			    var _bullet = new Bullet({
+			    	width: 9,
+			    	height: 54,
+			    	x: _self.x + _self.width / 2 - 5,
+			    	y: _self.y,
+			    	speed: _self.speed * 1.5 
+			    }); 
+
+			    ns.activeBullets.push(_bullet);
+
+			    if(!ns.hasShot)
+			  		ns.hasShot = true;
 			}
 		};
 

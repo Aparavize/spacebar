@@ -17,6 +17,7 @@
 		], 
 		function($, Main){
 			$(document).ready(function(){
+				ns.init();
 				Main.init();
 
 				// COUNT FPS

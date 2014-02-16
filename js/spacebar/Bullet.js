@@ -20,7 +20,25 @@ define(
 		};
 
 		Bullet.prototype = {
+			update:function(mod) {
+				this.y -= Math.round(this.speed * mod)
 
+	    		if(this.y < 0){
+	    			var index = ns.activeBullets.indexOf(this);
+
+	    			if(index > -1){
+	    				ns.activeBullets.splice(index, 1);
+
+	    				if(ns.activeBullets.length <= 0){
+	    					ns.hasShot = false;
+	    				}
+	    			}
+	    		}
+			},
+
+			render:function(){
+				ns.ctx.drawImage(this.skin, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+			}
 		};
 
 		return Bullet;
