@@ -5,11 +5,13 @@ define(
 		'spacebar/Player',
 		'spacebar/Bullet',
 		'spacebar/Meteor',
-		'spacebar/CollisionController'
+		'spacebar/CollisionController',
+		'spacebar/ScreenMap'
 	], 
-	function(ns, $, Player, Bullet, Meteor, CollisionController) {
+	function(ns, $, Player, Bullet, Meteor, CollisionController, ScreenMap) {
 		var Main = {
 			init: function(){
+				ns.ScreenMap = new ScreenMap();
 
 				// Variables accessibles in Main
 				var player = new Player({
@@ -70,6 +72,9 @@ define(
 			    			ns.activeMeteors[i].update(mod);
 			    		}
 			    	}
+
+			    	// Update tiles
+			    	ns.ScreenMap.update();
 				}
 				 
 				function render() {

@@ -4,6 +4,17 @@
 		ns.app = null;
 		ns.name = 'spacebar';
 
+		ns.checkIfInTile = function(obj, tile){
+			var testPosXOrigin = (obj.x >= tile.xStart && obj.x <= tile.xEnd);
+			var testPosXWidth = (obj.x + obj.width >= tile.xStart && obj.x + obj.width <= tile.xEnd);
+
+			var testPosYOrigin = (obj.y >= tile.yStart && obj.y <= tile.yEnd);
+			var testPosYHeight = (obj.y + obj.height >= tile.yStart && obj.y + obj.height <= tile.yEnd);
+
+			//console.log((testPosXOrigin || testPosXWidth) && (testPosYOrigin || testPosYHeight));
+			return ((testPosXOrigin || testPosXWidth) && (testPosYOrigin || testPosYHeight));
+		}
+
 		ns.init = function(){
 			// shim layer with setTimeout fallback
 			window.requestAnimFrame = (function(){

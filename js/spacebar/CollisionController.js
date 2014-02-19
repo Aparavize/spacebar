@@ -1,9 +1,11 @@
 define(
 	[
 		'spacebar/NameSpace',
-		'jquery'
+		'jquery',
+		'spacebar/Bullet',
+		'spacebar/Meteor'
 	], 
-	function(ns, $) {
+	function(ns, $, Bullet, Meteor) {
 		var CollisionController = function(){
 
 		};
@@ -21,18 +23,37 @@ define(
 			},
 
 			checkForCollisions:function(){
-		    	for(var i=0; i < ns.activeBullets.length; i++){
-		    		var _bullet = ns.activeBullets[i];
+				var _bulletsInTile = [];
+				var _meteorsInTile = [];
 
-		    		for(var j = 0; j < ns.activeMeteors.length; j++){
-		    			var _meteor = ns.activeMeteors[j];
+				for(var i = 0; i < ns.ScreenMap.tiles.length; i++){
+					_bulletsInTile = [];
+					_meteorsInTile = [];
+					var _tile = ns.ScreenMap.tiles[i];
 
-		    			var hit = _bullet.x >= _meteor.x && _bullet.x <= _meteor.x + _meteor.width && _bullet.y >= _meteor.y && _bullet.y <= _meteor.y + _meteor.height;
-		    			
-		    			if(hit)
-		    				ns.collisions.push({bullet:_bullet, meteor:_meteor})
-		    		}
-		    	}
+					for(var j = 0; j < _tile.objList.length; j++){
+						if(_tile.objList[j] instanceof Bullet){
+							_bulletsInTile.push(_tile.objList[j]);
+						}
+						else if(_tile.objList[j] instanceof Meteor){
+							_meteorsInTile.push(_tile.objList[j]);
+						}
+					}
+
+					for(var k=0; k < _bulletsInTile.length; k++){
+			    		var _bullet = _bulletsInTile[k];
+
+			    		for(var l = 0; l < _meteorsInTile.length; l++){
+			    			var _meteor = _meteorsInTile[l];
+
+			    			var hit = _bullet.x >= _meteor.x && _bullet.x <= _meteor.x + _meteor.width && _bullet.y >= _meteor.y && _bullet.y <= _meteor.y + _meteor.height;
+			    			if(hit)
+			    				ns.collisions.push({bullet:_bullet, meteor:_meteor})
+			    		}
+			    	}
+
+					//console.log(ns.collisions)
+				}
 			},
 
 			dealWithCollisions:function(){
