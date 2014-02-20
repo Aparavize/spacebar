@@ -65,26 +65,6 @@
 				}
 			]; 
 		};
-
-		ns.drawRotatedImage = function(obj, x, y, angle) { 
-			// save the current co-ordinate system 
-			// before we screw with it
-			ns.ctx.save(); 
-		 
-			// move to the middle of where we want to draw our image
-			ns.ctx.translate(x, y);
-		 
-			// rotate around that point, converting our 
-			// angle from degrees to radians 
-			ns.ctx.rotate(angle * ns.TO_RADIANS);
-		 
-			// draw it up and to the left by half the width
-			// and height of the image 
-			ns.ctx.drawImage(obj.skin, 0, 0, obj.width, obj.height, -(obj.width/2), -(obj.width/2), obj.width, obj.height);
-		 
-			// and restore the co-ords to how they were when we began
-			ns.ctx.restore(); 
-		};
 		
 		return ns;
 	});

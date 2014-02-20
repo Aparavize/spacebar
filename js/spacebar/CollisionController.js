@@ -46,8 +46,11 @@ define(
 			    		for(var l = 0; l < _meteorsInTile.length; l++){
 			    			var _meteor = _meteorsInTile[l];
 
-			    			var hit = _bullet.x >= _meteor.x && _bullet.x <= _meteor.x + _meteor.width && _bullet.y >= _meteor.y && _bullet.y <= _meteor.y + _meteor.height;
-			    			if(hit)
+			    			var hitX = _bullet.boundaries.UL.x >= _meteor.boundaries.UL.x && _bullet.boundaries.UL.x <= _meteor.boundaries.UR.x;
+			    			var hitY = _bullet.boundaries.UL.y >= _meteor.boundaries.UL.y && _bullet.boundaries.UL.y <= _meteor.boundaries.LL.y;
+			    			//var hit = _bullet.boundaries >= _meteor.x && _bullet.x <= _meteor.x + _meteor.width && _bullet.y >= _meteor.y && _bullet.y <= _meteor.y + _meteor.height;
+			    			
+			    			if(hitX && hitY)
 			    				ns.collisions.push({bullet:_bullet, meteor:_meteor})
 			    		}
 			    	}

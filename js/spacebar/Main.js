@@ -73,6 +73,7 @@ define(
 			    		}
 			    	}
 
+
 			    	// Update tiles
 			    	ns.ScreenMap.update();
 				}
