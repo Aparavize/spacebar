@@ -71,6 +71,8 @@ define(
 			    		for(var i = 0; i < ns.activeMeteors.length; i++){
 			    			ns.activeMeteors[i].update(mod);
 			    		}
+
+			    		//console.log(ns.activeMeteors[0].boundaries);
 			    	}
 
 			    	// Update tiles

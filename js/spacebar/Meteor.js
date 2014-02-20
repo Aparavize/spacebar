@@ -53,8 +53,7 @@ define(
 	    		this.y += Math.round(this.speedY * mod);
 	    		this.x += Math.round(this.speedX * mod) * this.directionX;
 	    		this.rotateAngle += Math.round(this.rotateSpeed * mod);
-	    		this.updateBoundaries();
-
+	    		
 	    		if(this.y > ns.canvas.height){
 	    			var index = ns.activeMeteors.indexOf(this);
 
@@ -81,32 +80,64 @@ define(
 			 
 				// draw it up and to the left by half the width
 				// and height of the image 
-				ns.ctx.drawImage(obj.skin, 0, 0, obj.width, obj.height, -(obj.width/2), -(obj.width/2), obj.width, obj.height);
-			 
+				ns.ctx.drawImage(obj.skin, 0, 0, obj.width, obj.height, -(obj.width/2), -(obj.height/2), obj.width, obj.height);
+
+				// Set coordinates of the boundaries wih the context rotated
+				this.updateBoundaries(true);
+				
+				// Draw the boundaries for visible hotspot
+				this.drawBoundaries();
+
+				// Setup boundaries to the normal points (this.x, this.y)
+				this.updateBoundaries(false);
+
 				// and restore the co-ords to how they were when we began
 				ns.ctx.restore(); 
 			},
 
-			updateBoundaries:function(){
+			updateBoundaries:function(isRotated){
 				var _self = this;
-				this.boundaries = {
-					UL:{
-						x:(_self.directionX == 1) ? _self.x : _self.x - _self.width,
-						y:_self.y
-					},
-					UR:{
-						x:(_self.directionX == 1) ? _self.x + _self.width : _self.x,
-						y:_self.y
-					},
-					LL:{
-						x:(_self.directionX == 1) ? _self.x : _self.x - _self.width,
-						y:_self.y + _self.height
-					},
-					LR:{
-						x:(_self.directionX == 1) ? _self.x + _self.width : _self.x,
-						y:_self.y + _self.height
-					}
-				};
+
+				if(isRotated){
+					this.boundaries = {
+						UL:{
+							x:(_self.directionX == 1) ? -(_self.width/2) : (_self.width/2) - _self.width,
+							y:-(_self.height/2)
+						},
+						UR:{
+							x:(_self.directionX == 1) ? -(_self.width/2) + _self.width : (_self.width/2),
+							y:-(_self.height/2)
+						},
+						LL:{
+							x:(_self.directionX == 1) ? -(_self.width/2) : (_self.width/2) - _self.width,
+							y:-(_self.height/2) + _self.height
+						},
+						LR:{
+							x:(_self.directionX == 1) ? -(_self.width/2) + _self.width : (_self.width/2),
+							y:-(_self.height/2) + _self.height
+						}
+					};
+				}
+				else {
+					this.boundaries = {
+						UL:{
+							x:(_self.directionX == 1) ? _self.x : _self.x - _self.width,
+							y:_self.y
+						},
+						UR:{
+							x:(_self.directionX == 1) ? _self.x + _self.width : _self.x,
+							y:_self.y
+						},
+						LL:{
+							x:(_self.directionX == 1) ? _self.x : _self.x - _self.width,
+							y:_self.y + _self.height
+						},
+						LR:{
+							x:(_self.directionX == 1) ? _self.x + _self.width : _self.x,
+							y:_self.y + _self.height
+						}
+					};
+				}
 			},
 
 			drawBoundaries:function(){
@@ -127,7 +158,7 @@ define(
 	    		var _meteorCenterY = this.y + this.height / 2;
 
 	    		this.drawRotatedImage(this, _meteorCenterX, _meteorCenterY, this.rotateAngle);
-	    		this.drawBoundaries();
+	    		//this.drawBoundaries();
 			}
 		};
 
