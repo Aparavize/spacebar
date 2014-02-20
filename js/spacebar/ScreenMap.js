@@ -70,6 +70,10 @@ define(
 								_tile.objList.push(_bullet);
 						}
 					}
+
+					if(ns.checkIfInTile(ns.player, _tile)){
+						_tile.objList.push(ns.player);
+					}
 				}
 			}
 		};

@@ -127,7 +127,7 @@ define(
 	    		var _meteorCenterY = this.y + this.height / 2;
 
 	    		this.drawRotatedImage(this, _meteorCenterX, _meteorCenterY, this.rotateAngle);
-	    		//this.drawBoundaries();
+	    		this.drawBoundaries();
 			}
 		};
 

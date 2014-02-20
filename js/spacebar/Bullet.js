@@ -88,13 +88,13 @@ define(
 		    	ns.ctx.lineTo(this.boundaries.UL.x, this.boundaries.UL.y);
 
 		    	ns.ctx.lineWidth = 1;
-		    	ns.ctx.strokeStyle = 'red';
+		    	ns.ctx.strokeStyle = 'magenta';
 		    	ns.ctx.stroke();
 			},
 
 			render:function(){
 				ns.ctx.drawImage(this.skin, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
-				//this.drawBoundaries();
+				this.drawBoundaries();
 			}
 		};
 

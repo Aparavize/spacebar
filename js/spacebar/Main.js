@@ -14,7 +14,7 @@ define(
 				ns.ScreenMap = new ScreenMap();
 
 				// Variables accessibles in Main
-				var player = new Player({
+				ns.player = new Player({
 					width:99,
 					height:75
 				});
@@ -56,8 +56,8 @@ define(
 					if((time - ns.lastMeteorSpawnTime) >= 750)
 						addMeteor();
 
-					// Update player
-					player.update(mod);
+					// Update ns.player
+					ns.player.update(mod);
 
 					// Update bullets, if any
 			    	if(ns.hasShot){
@@ -73,18 +73,17 @@ define(
 			    		}
 			    	}
 
-
 			    	// Update tiles
 			    	ns.ScreenMap.update();
 				}
 				 
 				function render() {
 					// Clear stage with a black BG
-				    ns.ctx.fillStyle = '#000';
-				    ns.ctx.fillRect(0, 0, ns.canvas.width, ns.canvas.height);
+				   	 ns.ctx.fillStyle = '#000';
+				  	  ns.ctx.fillRect(0, 0, ns.canvas.width, ns.canvas.height);
 
-				    // Render Player
-			    	player.render();
+				    // Render ns.player
+			    	ns.player.render();
 
 			    	// Render Bullets, if any
 				    if(ns.hasShot){
