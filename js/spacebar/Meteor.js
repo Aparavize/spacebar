@@ -12,11 +12,12 @@ define(
 			this.speedX = options.speedY || Math.round(Math.random() * 100) + 100;
 			this.rotateAngle = 0;
 			this.rotateSpeed = 50;
-			this.directionX = (Math.round(Math.random() * 10) > 5) ? 1 : -1;
 			this.width = options.width || randomMeteor.width;
 			this.height = options.height || randomMeteor.height;
-			this.x = options.x || 0;
+			this.x = options.x || Math.round(Math.random() * (ns.canvas.width - this.width));
 			this.y = options.y || -this.height;
+			this.directionY = 1;
+			this.directionX = (this.x > ns.canvas.width / 2) ? 1 : -1;
 
 			var _self = this;
 			this.boundaries = {
@@ -50,9 +51,20 @@ define(
 
 		Meteor.prototype = {
 			update:function(mod){
-	    		this.y += Math.round(this.speedY * mod);
+	    		this.y += Math.round(this.speedY * mod) * this.directionY;
 	    		this.x += Math.round(this.speedX * mod) * this.directionX;
 	    		this.rotateAngle += Math.round(this.rotateSpeed * mod);
+
+	    		for(var coordinates in this.boundaries){
+	    			if(this.boundaries[coordinates].x >= ns.canvas.width && this.directionX == 1){
+	    				this.directionX *= -1;
+	    				this.x = ns.canvas.width;
+	    			}
+	    			else if (this.boundaries[coordinates].x <= 0 && this.directionX == -1) {
+	    				this.directionX *= -1;
+	    				this.x = 0;
+	    			}
+	    		}
 	    		
 	    		if(this.y > ns.canvas.height){
 	    			var index = ns.activeMeteors.indexOf(this);

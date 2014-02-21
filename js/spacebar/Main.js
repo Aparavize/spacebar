@@ -37,7 +37,6 @@ define(
 					ns.lastMeteorSpawnTime = Date.now();
 
 					var _meteor = new Meteor({});
-					_meteor.x = Math.round(Math.random() * (ns.canvas.width - _meteor.width))
 
 					ns.activeMeteors.push(_meteor);
 

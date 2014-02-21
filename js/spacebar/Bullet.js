@@ -94,7 +94,7 @@ define(
 
 			render:function(){
 				ns.ctx.drawImage(this.skin, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
-				this.drawBoundaries();
+				//this.drawBoundaries();
 			}
 		};
 

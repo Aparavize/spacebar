@@ -62,13 +62,14 @@ define(
 			    	for(var m=0; m < _meteorsInTile.length; m++){
 			    		var _meteor = _meteorsInTile[m];
 
+			    		// Test if hit player
 			    		var hitXRight = ns.player.boundaries.UL.x >= _meteor.boundaries.UL.x && ns.player.boundaries.UL.x <= _meteor.boundaries.UR.x;
 			    		var hitXLeft = ns.player.boundaries.UR.x >= _meteor.boundaries.UL.x && ns.player.boundaries.UR.x <= _meteor.boundaries.UR.x;
 			    		var hitX = hitXLeft || hitXRight;
 
 		    			var hitYUp = ns.player.boundaries.UL.y >= _meteor.boundaries.UL.y && ns.player.boundaries.UL.y <= _meteor.boundaries.LL.y;
 		    			var hitYDown = ns.player.boundaries.LL.y >= _meteor.boundaries.UL.y && ns.player.boundaries.LL.y <= _meteor.boundaries.LL.y;
-		    			var hitY = hitYUp || hitYDown;
+						var hitY = hitYUp || hitYDown;
 
 		    			if(hitX && hitY)
 		    				ns.collisions.push({player:ns.player, meteor:_meteor})

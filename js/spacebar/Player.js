@@ -115,11 +115,11 @@ define(
 
 			render:function(){
 				ns.ctx.drawImage(this.skin, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
-				this.drawBoundaries();
+				//this.drawBoundaries();
 			},
 
 			shoot:function(){
-				if((Date.now() - ns.lastTimeShot) / 1000 < 0.1)
+				if((Date.now() - ns.lastTimeShot) / 1000 < 0.15)
 					return;
 
 				var _self = this;
